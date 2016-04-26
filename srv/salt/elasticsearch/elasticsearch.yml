@@ -1,0 +1,17 @@
+cluster.name: {{ grains['elasticsearch']['cluster'] }}
+node.name: {{ grains['fqdn'] }}
+
+#path.data: /home/leonzhan/elasticsearch/data
+#path.logs: /home/leonzhan/elasticsearch/log
+#path.plugins: /home/leonzhan/elasticsearch/plugin
+#path.repo: /home/leonzhan/backupdata
+
+bootstrap.mlockall: true
+
+network.host: {{ grains['ip4_interfaces']['eth0'][0] }}
+
+http.port: 9200
+transport.tcp.port: 9300
+
+discovery.zen.ping.unicast.hosts: ["es01", "es02", "es03"]
+discovery.zen.minimum_master_nodes: 2
