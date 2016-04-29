@@ -1,17 +1,70 @@
 cluster.name: {{ grains['elasticsearch']['cluster'] }}
 node.name: {{ grains['fqdn'] }}
 
+# Paths
 #path.data: /home/leonzhan/elasticsearch/data
 #path.logs: /home/leonzhan/elasticsearch/log
 #path.plugins: /home/leonzhan/elasticsearch/plugin
-#path.repo: /home/leonzhan/backupdata
+path.repo: /data/elastic/backup
 
+# Index
+index.number_of_shards: 3
+index.number_of_replicas: 1
+
+# Memory
 bootstrap.mlockall: true
+ES_HEAP_SIZE=6g
+indices.cache.filter.size: 10%
+index.cache.field.max_size: 50000 
+index.cache.field.expire: 10m 
+index.cache.field.type: soft 
+indices.fielddata.cache.size: 25%
+indices.fielddata.cache.expire: -1
+indices.breaker.total.limit: 70%
+indices.breaker.fielddata.limit: 70% 
+indices.breaker.fielddata.overhead: 1.03
+indices.breaker.request.limit: 40% 
+indices.breaker.request.overhead: 1
 
+# Translog
+index.translog.flush_threshold_size: 512mb 
+index.translog.flush_threshold_period: 30m 
+index.translog.interval: 5s
+index.gateway.local.sync: 5s
+
+# Network And HTTP
 network.host: {{ grains['ip4_interfaces']['eth0'][0] }}
-
 http.port: 9200
 transport.tcp.port: 9300
+transport.tcp.compress: true
 
-discovery.zen.ping.unicast.hosts: ["es01", "es02", "es03"]
+# Gateway
+gateway.expected_nodes: 3
+gateway.expected_master_nodes: 1
+gateway.expected_data_nodes: 3
+gateway.recover_after_time: 5m
+gateway.recover_after_nodes: 3
+gateway.recover_after_master_nodes: 1
+gateway.recover_after_data_nodes: 3
+
+# Recovery Throttling
+cluster.routing.allocation.node_initial_primaries_recoveries: 4
+cluster.routing.allocation.node_concurrent_recoveries: 2
+indices.recovery.max_size_per_sec: 100mb
+indices.recovery.concurrent_streams: 5
+
+# Discovery
 discovery.zen.minimum_master_nodes: 2
+discovery.zen.ping.timeout: 3s
+discovery.zen.fd.ping_timeout: 30s
+discovery.zen.ping.multicast.enabled: false
+discovery.zen.ping.unicast.hosts: ["es01", "es02", "es03"]
+
+# Allocation
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: .75
+cluster.routing.allocation.disk.watermark.high: .85
+cluster.routing.allocation.cluster_concurrent_rebalance: 2
+
+# Others
+action.disable_delete_all_indices: true
